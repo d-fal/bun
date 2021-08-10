@@ -717,14 +717,15 @@ func (q *SelectQuery) afterSelectHook(ctx context.Context) error {
 }
 
 func (q *SelectQuery) Count(ctx context.Context) (int, error) {
-	query, err := q.appendQuery(q.db.fmter, nil, true)
+	queryBytes, err := q.appendQuery(q.db.fmter, nil, true)
 	if err != nil {
 		return 0, err
 	}
+	query := internal.String(queryBytes)
 
 	var num int
 
-	if err := q.conn.QueryRowContext(ctx, internal.String(query)).Scan(&num); err != nil {
+	if err := q.conn.QueryRowContext(ctx, query).Scan(&num); err != nil {
 		return 0, err
 	}
 
